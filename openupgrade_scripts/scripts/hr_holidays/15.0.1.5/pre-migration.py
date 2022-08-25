@@ -14,7 +14,7 @@ def _fast_fill_hr_leave_employee_company_id(env):
         UPDATE hr_leave hl
         SET employee_company_id = empl.company_id
         FROM hr_employee empl
-        WHERE hl.employee_id IS NOT NULL AND hl.employee_id = empl.id""",
+        WHERE empl.company_id IS NOT NULL AND hl.employee_id = empl.id""",
     )
 
 
@@ -89,7 +89,7 @@ def _fast_fill_hr_leave_allocation_employee_company_id(env):
         UPDATE hr_leave hl
         SET employee_company_id = empl.company_id
         FROM hr_employee empl
-        WHERE hl.employee_id IS NOT NULL AND hl.employee_id = empl.id""",
+        WHERE empl.company_id IS NOT NULL AND hl.employee_id = empl.id""",
     )
 
 
@@ -148,7 +148,7 @@ def _fast_fill_hr_leave_multi_employee(env):
         env.cr,
         """
         ALTER TABLE hr_leave
-        ADD COLUMN IF NOT EXISTS multi_employee boolean""",
+        ADD COLUMN IF NOT EXISTS multi_employee bool""",
     )
     openupgrade.logged_query(
         env.cr,
@@ -204,13 +204,21 @@ def _fast_fill_hr_leave_allocation_multi_employee(env):
     )
 
 
-def _create_column_hr_leave_holiday_allocation_id(env):
-    # Manually create column for avoiding the automatic launch of the compute or default
-    openupgrade.logged_query(
-        env.cr,
-        """
-        ALTER TABLE hr_leave
-        ADD COLUMN IF NOT EXISTS holiday_allocation_id integer""",
+def delete_sql_constraints(env):
+    openupgrade.delete_sql_constraint_safely(
+        env, "hr_holidays", "hr_leave_allocation", "duration_check"
+    )
+    openupgrade.delete_sql_constraint_safely(
+        env, "hr_holidays", "hr_leave_allocation", "type_value"
+    )
+    openupgrade.delete_sql_constraint_safely(
+        env, "hr_holidays", "hr_leave", "type_value"
+    )
+    openupgrade.delete_sql_constraint_safely(
+        env, "hr_holidays", "hr_leave_allocation", "interval_number_check"
+    )
+    openupgrade.delete_sql_constraint_safely(
+        env, "hr_holidays", "hr_leave_allocation", "number_per_interval_check"
     )
 
 
@@ -229,4 +237,4 @@ def migrate(env, version):
     _fast_fill_hr_leave_multi_employee(env)
     _fast_fill_hr_leave_allocation_employee_ids(env)
     _fast_fill_hr_leave_allocation_multi_employee(env)
-    _create_column_hr_leave_holiday_allocation_id(env)
+    delete_sql_constraints(env)

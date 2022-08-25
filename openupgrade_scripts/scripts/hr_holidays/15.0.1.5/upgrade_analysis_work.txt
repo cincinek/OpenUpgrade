@@ -16,7 +16,7 @@ hr_holidays  / hr.leave                 / employee_ids (many2many)      : NEW re
 # DONE: pre-migration: create table hr_employee_hr_leave_rel and fill data
 
 hr_holidays  / hr.leave                 / holiday_allocation_id (many2one): NEW relation: hr.leave.allocation, isfunction: function, stored
-# DONE: pre-migration: create column; post-migration: fill data
+# NOTHING TO DO (due to https://github.com/odoo/odoo/pull/96545)
 
 hr_holidays  / hr.leave                 / multi_employee (boolean)      : NEW isfunction: function, stored
 # DONE: pre-migration: create column and fill data
@@ -164,11 +164,17 @@ NEW ir.model.access: hr_holidays.access_hr_leave_employee_type_report
 NEW ir.model.constraint: hr_holidays.constraint_hr_leave_accrual_level_added_value_greater_than_zero
 NEW ir.model.constraint: hr_holidays.constraint_hr_leave_accrual_level_check_dates
 NEW ir.model.constraint: hr_holidays.constraint_hr_leave_accrual_level_start_count_check
+# NOTHING TO DO
+
 ir.model.constraint: hr_holidays.constraint_hr_leave_allocation_duration_check (changed definition: is now 'check(( number_of_days > 0 and allocation_type='regular') or(allocation_type != 'regular'))' ('check( number_of_days >= 0 )'))
 ir.model.constraint: hr_holidays.constraint_hr_leave_allocation_type_value (changed definition: is now 'check((holiday_type='employee' and(employee_id is not null or multi_employee is true)) or(holiday_type='category' and category_id is not null) or(holiday_type='department' and department_id is not null) or(holiday_type='company' and mode_company_id is not null))' ('check((holiday_type='employee' and employee_id is not null) or(holiday_type='category' and category_id is not null) or(holiday_type='department' and department_id is not null) or(holiday_type='company' and mode_company_id is not null))'))
 ir.model.constraint: hr_holidays.constraint_hr_leave_type_value (changed definition: is now 'check((holiday_type='employee' and(employee_id is not null or multi_employee is true)) or(holiday_type='company' and mode_company_id is not null) or(holiday_type='category' and category_id is not null) or(holiday_type='department' and department_id is not null) )' ('check((holiday_type='employee' and employee_id is not null) or(holiday_type='company' and mode_company_id is not null) or(holiday_type='category' and category_id is not null) or(holiday_type='department' and department_id is not null) )'))
+# DONE: pre-migration: delete constraints and let ORM add them again
+
 DEL ir.model.constraint: hr_holidays.constraint_hr_leave_allocation_interval_number_check
 DEL ir.model.constraint: hr_holidays.constraint_hr_leave_allocation_number_per_interval_check
+# DONE: pre-migration: safely delete constraints
+
 NEW ir.rule: hr_holidays.hr_leave_report_rule_group_holiday_user (noupdate)
 NEW ir.rule: hr_holidays.hr_leave_report_rule_group_user (noupdate)
 NEW ir.ui.menu: hr_holidays.hr_holidays_accrual_menu_configuration
