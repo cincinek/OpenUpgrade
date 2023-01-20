@@ -139,6 +139,8 @@ def _fast_fill_hr_leave_employee_ids(env):
         SELECT hl.id, hl.employee_id
         FROM hr_leave hl
         WHERE hl.holiday_type = 'employee'
+            AND hl.holiday_type IS NOT NULL
+        ON CONFLICT DO NOTHING
         """,
     )
 
@@ -180,6 +182,7 @@ def _fast_fill_hr_leave_allocation_employee_ids(env):
         SELECT hla.id, hla.employee_id
         FROM hr_leave_allocation hla
         WHERE hla.holiday_type = 'employee'
+            AND hla.holiday_type IS NOT NULL
         """,
     )
 
